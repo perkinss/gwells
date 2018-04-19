@@ -1,0 +1,127 @@
+{
+    "kind": "Template",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "gwells-backend-bc",
+        "creationTimestamp": null
+    },
+    "parameters": [
+      {
+        "name": "NAME_SUFFIX",
+        "displayName": "Name Suffix",
+        "description": "A suffix appended to all objects",
+        "required": true
+      },
+      {
+        "name": "SOURCE_REPOSITORY_URL",
+        "required": true
+      },
+      {
+        "name": "ENV_NAME",
+        "required": true
+      }
+    ],
+    "objects": [
+        {
+            "kind": "ImageStream",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "gwells${NAME_SUFFIX}",
+                "creationTimestamp": null,
+                "labels": {
+                    "base-name":"gwells"
+                },
+                "annotations": {
+                    "description": "Keeps track of changes in the application image"
+                }
+            },
+            "spec": {
+                "lookupPolicy": {
+                    "local": false
+                }
+            }
+        },
+        {
+            "kind": "BuildConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "gwells${NAME_SUFFIX}",
+                "creationTimestamp": null,
+                "annotations": {
+                    "description": "Defines how to build the application"
+                }
+            },
+            "spec": {
+                "triggers": [
+                    {
+                        "type": "ImageChange",
+                        "imageChange": {}
+                    },
+                    {
+                        "type": "ConfigChange"
+                    }
+                ],
+                "runPolicy": "Serial",
+                "source": {
+                    "type": "Git",
+                    "git": {
+                        "uri": "${SOURCE_REPOSITORY_URL}",
+                        "ref": "master"
+                    },
+                    "contextDir": "app"
+                },
+                "strategy": {
+                    "type": "Source",
+                    "sourceStrategy": {
+                        "from": {
+                            "kind": "ImageStreamTag",
+                            "namespace": "openshift",
+                            "name": "python:3.5"
+                        },
+                        "env": [
+                            {
+                                "name": "BUILD_LOGLEVEL",
+                                "value": "4"
+                            },
+                            {
+                                "name": "PIP_INDEX_URL"
+                            },
+                            {
+                                "name": "UPGRADE_PIP_TO_LATEST",
+                                "value": "true"
+                            },
+                            {
+                                "name": "JWT_PUBLIC_KEY",
+                                "value": "-----BEGIN PUBLIC KEY-----\\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjpPznS8NO5XNl395Xa/wJyhhMDMJUk8s2wrG/FQ9gZnRaCbm9YFYynZzeehkpTNbb+SsLBnh0Me5DKTSlt0Gm03ULXXW6FZzL3SCE1wTx6Trm+zQ1mx07aGDbv34OtK0HitToajZrnTsGQ0TloVbQladBM74S2K0ooveV7p2qIydFjtR+DTJGiOxSLvts+qsGn/Wr2l939SRpQa/10vpYJgCLsd6Bv/0v23DpmR8WbVkLh8e3rtI0XgsJ0ZFXR80DPt3fXX3gdrNdPRB+hpOR8IZMEUzhqGRg5VXP8Lp+bbaemFanTwlFD3aUfDlOcPekxYqQeEmS6ahA/6vCpjuGwIDAQAB\\n-----END PUBLIC KEY-----"
+                            },
+                            {
+                                "name": "JWT_AUDIENCE",
+                                "value": "webapp-dev-local"
+                            }
+                        ]
+                    }
+                },
+                "output": {
+                    "to": {
+                        "kind": "ImageStreamTag",
+                        "name": "gwells${NAME_SUFFIX}:latest"
+                    }
+                },
+                "resources": {
+                    "limits": {
+                        "cpu": "2",
+                        "memory": "8Gi"
+                    },
+                    "requests": {
+                        "cpu": "1",
+                        "memory": "4Gi"
+                    }
+                },
+                "postCommit": {
+                    "script": "python manage.py migrate\npython manage.py test -c nose.cfg\n"
+                },
+                "nodeSelector": null
+            }
+        }
+    ]
+}
