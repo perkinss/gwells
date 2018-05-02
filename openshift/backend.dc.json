@@ -379,7 +379,7 @@
                                     },
                                     {
                                         "name": "GUNICORN_WORKERS",
-                                        "value": "4"
+                                        "value": "16"
                                     },
                                     {
                                         "name": "ENFORCE_ENV_VARIABLES",

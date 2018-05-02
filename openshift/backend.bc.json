@@ -106,6 +106,21 @@
             }
         },
         {
+            "kind": "ImageStream",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "gwells-static",
+                "creationTimestamp": null,
+                "labels": { },
+                "annotations": { }
+            },
+            "spec": {
+                "lookupPolicy": {
+                    "local": false
+                }
+            }
+        },
+        {
             "kind": "BuildConfig",
             "apiVersion": "v1",
             "metadata": {
@@ -289,7 +304,7 @@
                 "output": {
                     "to": {
                         "kind": "ImageStreamTag",
-                        "name": "gwells${NAME_SUFFIX}:latest"
+                        "name": "gwells${NAME_SUFFIX}:${ENV_NAME}"
                     }
                 },
                 "resources": {
@@ -303,6 +318,72 @@
                     }
                 },
                 "nodeSelector": null
+            }
+        },
+        {
+            "kind": "BuildConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "gwells-static${NAME_SUFFIX}",
+                "creationTimestamp": null,
+                "labels": { },
+                "annotations": { }
+            },
+            "spec": {
+                "triggers": [
+                    {
+                        "type": "ImageChange",
+                        "imageChange": {
+                            "from": {
+                                "kind": "ImageStreamTag",
+                                "name": "gwells${NAME_SUFFIX}:${ENV_NAME}"
+                            }
+                        }
+                    },
+                    {
+                        "type": "ConfigChange"
+                    }
+                ],
+                "source": {
+                    "type": "Dockerfile",
+                    "dockerfile": "FROM openshift/bcgov-s2i-caddy:latest\nCOPY staticfiles/* var/www/html/\nCMD [\"sh\",\"/tmp/scripts/run\"]\n",
+                    "images": [
+                        {
+                            "from": {
+                                "kind": "ImageStreamTag",
+                                "name": "gwells${NAME_SUFFIX}:${ENV_NAME}"
+                            },
+                            "paths": [
+                                {
+                                    "sourcePath": "opt/app-root/src/staticfiles",
+                                    "destinationDir": "."
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "strategy": {
+                    "type": "Docker",
+                    "dockerStrategy": {
+                        "from": {
+                            "kind": "ImageStreamTag",
+                            "namespace": "openshift",
+                            "name": "bcgov-s2i-caddy:latest"
+                        }
+                    }
+                },
+                "output": {
+                    "to": {
+                        "kind": "ImageStreamTag",
+                        "name": "gwells-static${NAME_SUFFIX}:${ENV_NAME}"
+                    }
+                },
+                "resources": {},
+                "postCommit": {},
+                "nodeSelector": null
+            },
+            "status": {
+                "lastVersion": 0
             }
         }
     ]
