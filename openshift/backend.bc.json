@@ -111,7 +111,9 @@
             "metadata": {
                 "name": "gwells-static${NAME_SUFFIX}",
                 "creationTimestamp": null,
-                "labels": { },
+                "labels": {
+                    "base-name":"gwells-static"
+                },
                 "annotations": { }
             },
             "spec": {
