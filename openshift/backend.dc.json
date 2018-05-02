@@ -481,6 +481,34 @@
             }
         },
         {
+            "kind": "Route",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "gwells${NAME_SUFFIX}",
+                "creationTimestamp": null,
+                "labels": {
+                    "frontend": "true"
+                },
+                "annotations": { }
+            },
+            "spec": {
+                "host": "${HOST}",
+                "path": "/gwells",
+                "to": {
+                    "kind": "Service",
+                    "name": "gwells${NAME_SUFFIX}",
+                    "weight": 100
+                },
+                "port": {
+                    "targetPort": "web"
+                },
+                "tls": {
+                    "termination": "edge"
+                },
+                "wildcardPolicy": "None"
+            }
+        },
+        {
             "kind": "DeploymentConfig",
             "apiVersion": "v1",
             "metadata": {
@@ -550,17 +578,17 @@
                                 ],
                                 "resources": {
                                     "limits": {
-                                        "cpu": "500m",
-                                        "memory": "1024Mi"
+                                        "cpu": "200m",
+                                        "memory": "256Mi"
                                     },
                                     "requests": {
-                                        "cpu": "200m",
-                                        "memory": "500Mi"
+                                        "cpu": "100m",
+                                        "memory": "128Mi"
                                     }
                                 },
                                 "livenessProbe": {
                                     "httpGet": {
-                                        "path": "/gwells/icons/favicon.ico",
+                                        "path": "/gwells/static/gwells/icons/geolocate.png",
                                         "port": 2015,
                                         "scheme": "HTTP"
                                     },
@@ -572,7 +600,7 @@
                                 },
                                 "readinessProbe": {
                                     "httpGet": {
-                                        "path": "/gwells/icons/favicon.ico",
+                                        "path": "/gwells/static/gwells/icons/geolocate.png",
                                         "port": 2015,
                                         "scheme": "HTTP"
                                     },
@@ -627,7 +655,7 @@
             "kind": "Route",
             "apiVersion": "v1",
             "metadata": {
-                "name": "gwells${NAME_SUFFIX}",
+                "name": "gwells-static${NAME_SUFFIX}",
                 "creationTimestamp": null,
                 "labels": {
                     "frontend": "true"
@@ -635,11 +663,11 @@
                 "annotations": { }
             },
             "spec": {
-                "host": "",
-                "path": "/gwells",
+                "host": "${HOST}",
+                "path": "/gwells/static/",
                 "to": {
                     "kind": "Service",
-                    "name": "gwells${NAME_SUFFIX}",
+                    "name": "gwells-static${NAME_SUFFIX}",
                     "weight": 100
                 },
                 "port": {
