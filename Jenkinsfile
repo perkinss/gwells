@@ -167,7 +167,7 @@ podTemplate(label: label, serviceAccount: 'jenkins', cloud: 'openshift', contain
                 name: 'jnlp',
                 image: '172.50.0.2:5000/openshift/jenkins-slave-python3nodejs',
                 resourceRequestCpu: '500m',
-                resourceLimitCpu: '1000m',
+                resourceLimitCpu: '2000m',
                 resourceRequestMemory: '1Gi',
                 resourceLimitMemory: '4Gi',
                 workingDir: '/tmp',

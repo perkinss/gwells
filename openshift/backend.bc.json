@@ -348,7 +348,7 @@
                 ],
                 "source": {
                     "type": "Dockerfile",
-                    "dockerfile": "FROM openshift/bcgov-s2i-caddy:latest\nCOPY staticfiles/* var/www/html/\nCMD [\"sh\",\"/tmp/scripts/run\"]\n",
+                    "dockerfile": "FROM openshift/bcgov-s2i-caddy:latest\nCOPY staticfiles/* /var/www/html/\nCMD [\"sh\",\"/tmp/scripts/run\"]\n",
                     "images": [
                         {
                             "from": {
