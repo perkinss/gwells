@@ -109,7 +109,7 @@
             "kind": "ImageStream",
             "apiVersion": "v1",
             "metadata": {
-                "name": "gwells-static",
+                "name": "gwells-static${NAME_SUFFIX}",
                 "creationTimestamp": null,
                 "labels": { },
                 "annotations": { }
