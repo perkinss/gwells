@@ -50,11 +50,11 @@ Map context = [
       ]
   ],
   stages:[
-    'Build':true,
-    'Unit Test':false,
+    'Build': true,
+    'Unit Test': false,
     'Code Quality': false,
     'Readiness - DEV': true,
-    'Full Test - DEV':false
+    'Full Test - DEV': true
   ]
 ]
 
