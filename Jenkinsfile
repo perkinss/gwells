@@ -53,7 +53,7 @@ Map context = [
                   'POSTGRESQL_DATABASE':'gwells'
               ]
           ],
-          ['file':'openshift/backend.dc.json', 'params':['HOST':'${env[DEPLOY_ENV_NAME]?.params?.host?:"gwells${deployments[DEPLOY_ENV_NAME].dcSuffix}-${deployments[DEPLOY_ENV_NAME].projectName}.pathfinder.gov.bc.ca"}']]
+          ['file':'openshift/backend.dc.json', 'params':['HOST':'${env[DEPLOY_ENV_NAME]?.params?.host?:("gwells" + deployments[DEPLOY_ENV_NAME].dcSuffix + "-" + deployments[DEPLOY_ENV_NAME].projectName + ".pathfinder.gov.bc.ca")}']]
       ]
   ],
   stages:[
