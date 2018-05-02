@@ -62,7 +62,7 @@ Map context = [
     'Code Quality': false,
     'Readiness - DEV': true,
     'Deploy - DEV': true,
-    'Full Test - DEV': false
+    'Full Test - DEV': true
   ]
 ]
 
