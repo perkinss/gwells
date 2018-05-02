@@ -5,6 +5,7 @@
 - PodTemplate name/label has to be unique.
     otherwise,there is some configuration caching that won't actually take the latest configuration
     e.g.: Changing image, envvars, so on.
+    maybe only when overwriting global templates?
 */
 
 import hudson.model.Result;
@@ -281,9 +282,20 @@ podTemplate(label: label, serviceAccount: 'jenkins', cloud: 'openshift', contain
             }
         }
 
+        if ("DEV".equalsIgnoreCase(stageDeployName)){
+            _stage('Load Test Data', context) {
+                node('master'){
+                    String podName=null
+                    openshift.withProject('csnr-devops-lab-deploy'){
+                        podName=openshift.selector('pod', ['deploymentconfig':"gwells-dev-pr-1"]).objects()[0].metadata.name
+                    }
+                    sh "oc exec '${podName}' -n 'csnr-devops-lab-deploy' -- bash -c 'cd /opt/app-root/src && pwd && python manage.py loaddata wells registries'"
+                }
+            }
+        }
 
-        if (1 == 1 && "DEV".equalsIgnoreCase(stageDeployName)){
-            stage('API Test') {
+        if ("DEV".equalsIgnoreCase(stageDeployName)){
+            _stage('API Test', context) {
                 String baseURL = context.deployments[envKeyName].environmentUrl.substring(0, context.deployments[envKeyName].environmentUrl.indexOf('/', 8) + 1)
                 podTemplate(label: "nodejs-${context.uuid}", name: "nodejs-${context.uuid}", serviceAccount: 'jenkins', cloud: 'openshift', containers: [
                   containerTemplate(
@@ -349,17 +361,11 @@ podTemplate(label: label, serviceAccount: 'jenkins', cloud: 'openshift', contain
         }
 
         if ("DEV".equalsIgnoreCase(stageDeployName) || isCD){
-            String baseURL = context.deployments[envKeyName].environmentUrl.substring(0, context.deployments[envKeyName].environmentUrl.indexOf('/', 8) + 1)
             String testStageName="DEV".equalsIgnoreCase(stageDeployName)?"Full Test - DEV":"Smoke Test - ${stageDeployName}"
             _stage(testStageName, context){
+                String baseURL = context.deployments[envKeyName].environmentUrl.substring(0, context.deployments[envKeyName].environmentUrl.indexOf('/', 8) + 1)
                 if ("DEV".equalsIgnoreCase(stageDeployName)){
-                    node('master'){
-                        String podName=null
-                        openshift.withProject('csnr-devops-lab-deploy'){
-                            podName=openshift.selector('pod', ['deploymentconfig':"gwells-dev-pr-1"]).objects()[0].metadata.name
-                        }
-                        sh "oc exec '${podName}' -n 'csnr-devops-lab-deploy' -- bash -c 'cd /opt/app-root/src && pwd && python manage.py loaddata wells registries'"
-                    }
+
                 }
                 podTemplate(label: "bddstack-${uuid}", name: "bddstack-${uuid}", serviceAccount: 'jenkins', cloud: 'openshift', containers: [
                   containerTemplate(
