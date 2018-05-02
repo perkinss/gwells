@@ -399,9 +399,9 @@ podTemplate(label: label, serviceAccount: 'jenkins', cloud: 'openshift', contain
                         checkout scm
                         dir('functional-tests/build/test-results') {
                             sh 'echo "BASEURL=${BASEURL}"'
-                            unstash 'coverage'
+                            //unstash 'coverage'
                             sh 'rm coverage.xml'
-                            unstash 'nodejunit'
+                            //unstash 'nodejunit'
                             }
                         //dir('app') {
                         //    sh 'python manage.py loaddata wells registries'
