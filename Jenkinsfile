@@ -166,8 +166,8 @@ podTemplate(label: label, serviceAccount: 'jenkins', cloud: 'openshift', contain
             containerTemplate(
                 name: 'jnlp',
                 image: '172.50.0.2:5000/openshift/jenkins-slave-python3nodejs',
-                resourceRequestCpu: '500m',
-                resourceLimitCpu: '2000m',
+                resourceRequestCpu: '4000m',
+                resourceLimitCpu: '4000m',
                 resourceRequestMemory: '1Gi',
                 resourceLimitMemory: '4Gi',
                 workingDir: '/tmp',
@@ -185,7 +185,7 @@ podTemplate(label: label, serviceAccount: 'jenkins', cloud: 'openshift', contain
                             sh 'cd frontend && npm install'
                             sh 'cd frontend && npm run build'
                             sh 'python manage.py collectstatic && python manage.py migrate'
-                            sh 'export ENABLE_DATA_ENTRY="True" && python manage.py test -c nose.cfg'
+                            sh 'export ENABLE_DATA_ENTRY="True" && export NOSE_PROCESSES=4 && python manage.py test -c nose.cfg'
                             sh 'cd frontend && npm test'
                         }
                         finally {
