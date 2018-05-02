@@ -286,10 +286,15 @@ podTemplate(label: label, serviceAccount: 'jenkins', cloud: 'openshift', contain
             _stage('Load Fixtures', context) {
                 node('master'){
                     String podName=null
-                    openshift.withProject(context.env[envKeyName].project){
-                        podName=openshift.selector('pod', ['deploymentconfig':"gwells-dev${context.env[envKeyName].dcSuffix}"]).objects()[0].metadata.name
+                    String projectName=context.env[envKeyName].project
+                    String deploymentConfigName="gwells-dev${context.env[envKeyName].dcSuffix}"
+                    echo "projectName:${projectName}"
+                    echo "deploymentConfigName:${deploymentConfigName}"
+
+                    openshift.withProject(projectName){
+                        podName=openshift.selector('pod', ['deploymentconfig':deploymentConfigName]).objects()[0].metadata.name
                     }
-                    sh "oc exec '${podName}' -n '${context.env[envKeyName].project}' -- bash -c 'cd /opt/app-root/src && pwd && python manage.py loaddata wells registries'"
+                    sh "oc exec '${podName}' -n '${projectName}' -- bash -c 'cd /opt/app-root/src && pwd && python manage.py loaddata wells registries'"
                 }
             }
         }
@@ -335,7 +340,7 @@ podTemplate(label: label, serviceAccount: 'jenkins', cloud: 'openshift', contain
                             echo BASEURL=$BASEURL
                         '''
 
-                        input(message: "Verify Environment variables. Continue?")
+                        //input(message: "Verify Environment variables. Continue?")
                         checkout scm
                         dir('api-tests') {
                             sh 'npm install -g newman'
