@@ -275,7 +275,7 @@ podTemplate(label: label, serviceAccount: 'jenkins', cloud: 'openshift', contain
         }
 
 
-        if (1 == 2 && "DEV".equalsIgnoreCase(stageDeployName)){
+        if (1 == 1 && "DEV".equalsIgnoreCase(stageDeployName)){
             String baseURL = context.deployments[envKeyName].environmentUrl.substring(0, context.deployments[envKeyName].environmentUrl.indexOf('/', 8) + 1)
             stage('API Test') {
                 podTemplate(label: 'nodejs', name: 'nodejs', serviceAccount: 'jenkins', cloud: 'openshift', containers: [
