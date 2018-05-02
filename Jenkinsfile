@@ -1,5 +1,11 @@
 // Jenkinsfile (Scripted Pipeline)
 
+/* Gotchas
+
+- PodTemplate name/label has to be unique.
+    otherwise,there is some configuration caching that won't actually take the latest configuration
+    e.g.: Changing image, envvars, so on.
+*/
 
 import hudson.model.Result;
 import jenkins.model.CauseOfInterruption.UserInterruption;
@@ -277,10 +283,9 @@ podTemplate(label: label, serviceAccount: 'jenkins', cloud: 'openshift', contain
 
 
         if (1 == 1 && "DEV".equalsIgnoreCase(stageDeployName)){
-
             stage('API Test') {
                 String baseURL = context.deployments[envKeyName].environmentUrl.substring(0, context.deployments[envKeyName].environmentUrl.indexOf('/', 8) + 1)
-                podTemplate(label: 'nodejs', name: 'nodejs', serviceAccount: 'jenkins', cloud: 'openshift', containers: [
+                podTemplate(label: "nodejs-${context.uuid}", name: "nodejs-${context.uuid}", serviceAccount: 'jenkins', cloud: 'openshift', containers: [
                   containerTemplate(
                     name: 'jnlp',
                     image: 'registry.access.redhat.com/openshift3/jenkins-slave-nodejs-rhel7',
@@ -309,7 +314,7 @@ podTemplate(label: label, serviceAccount: 'jenkins', cloud: 'openshift', contain
                     secretEnvVar(key: 'GWELLS_API_TEST_CLIENT_SECRET', secretName: 'apitest-secrets', secretKey: 'client_secret')
                 ])
                 {
-                    node('nodejs') {
+                    node("nodejs-${context.uuid}") {
                     //the checkout is mandatory, otherwise functional test would fail
                         echo "checking out source"
                         echo "Build: ${BUILD_ID}"
