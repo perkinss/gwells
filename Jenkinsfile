@@ -287,7 +287,7 @@ podTemplate(label: label, serviceAccount: 'jenkins', cloud: 'openshift', contain
                 node('master'){
                     String podName=null
                     String projectName=context.deployments[envKeyName].projectName
-                    String deploymentConfigName="gwells{context.deployments[envKeyName].dcSuffix}"
+                    String deploymentConfigName="gwells${context.deployments[envKeyName].dcSuffix}"
                     echo "env:${context.env[envKeyName]}"
                     echo "deployment:${context.deployments[envKeyName]}"
                     echo "projectName:${projectName}"
