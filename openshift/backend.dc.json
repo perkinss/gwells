@@ -629,7 +629,9 @@
             "metadata": {
                 "name": "gwells${NAME_SUFFIX}",
                 "creationTimestamp": null,
-                "labels": { },
+                "labels": {
+                    "frontend": "true"
+                },
                 "annotations": { }
             },
             "spec": {
