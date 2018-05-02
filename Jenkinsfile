@@ -58,11 +58,11 @@ Map context = [
   ],
   stages:[
     'Build': true,
-    'Unit Test': true,
+    'Unit Test': false,
     'Code Quality': false,
     'Readiness - DEV': true,
     'Deploy - DEV': true,
-    'Full Test - DEV': true
+    'Full Test - DEV': false
   ]
 ]
 
@@ -282,8 +282,8 @@ podTemplate(label: label, serviceAccount: 'jenkins', cloud: 'openshift', contain
             }
         }
 
-        if ("DEV".equalsIgnoreCase(stageDeployName)){
-            _stage('Load Fixtures', context) {
+        if ("DEV".equalsIgnoreCase(stageDeployName) || "TEST".equalsIgnoreCase(stageDeployName)){
+            _stage("Load Fixtures - ${stageDeployName}", context) {
                 node('master'){
                     String podName=null
                     String projectName=context.deployments[envKeyName].projectName
