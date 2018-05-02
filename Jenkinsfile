@@ -283,13 +283,13 @@ podTemplate(label: label, serviceAccount: 'jenkins', cloud: 'openshift', contain
         }
 
         if ("DEV".equalsIgnoreCase(stageDeployName)){
-            _stage('Load Test Data', context) {
+            _stage('Load Fixtures', context) {
                 node('master'){
                     String podName=null
-                    openshift.withProject('csnr-devops-lab-deploy'){
-                        podName=openshift.selector('pod', ['deploymentconfig':"gwells-dev-pr-1"]).objects()[0].metadata.name
+                    openshift.withProject(context.env[envKeyName].project){
+                        podName=openshift.selector('pod', ['deploymentconfig':"gwells-dev${context.env[envKeyName].dcSuffix}"]).objects()[0].metadata.name
                     }
-                    sh "oc exec '${podName}' -n 'csnr-devops-lab-deploy' -- bash -c 'cd /opt/app-root/src && pwd && python manage.py loaddata wells registries'"
+                    sh "oc exec '${podName}' -n '${context.env[envKeyName].project}' -- bash -c 'cd /opt/app-root/src && pwd && python manage.py loaddata wells registries'"
                 }
             }
         }
