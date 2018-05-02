@@ -286,9 +286,10 @@ podTemplate(label: label, serviceAccount: 'jenkins', cloud: 'openshift', contain
             _stage('Load Fixtures', context) {
                 node('master'){
                     String podName=null
-                    String projectName=context.env[envKeyName].project
-                    String deploymentConfigName="gwells-dev${context.env[envKeyName].dcSuffix}"
+                    String projectName=context.deployments[envKeyName].projectName
+                    String deploymentConfigName="gwells-dev${context.deployments[envKeyName].dcSuffix}"
                     echo "env:${context.env[envKeyName]}"
+                    echo "deployment:${context.deployments[envKeyName]}"
                     echo "projectName:${projectName}"
                     echo "deploymentConfigName:${deploymentConfigName}"
 
