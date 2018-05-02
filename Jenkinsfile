@@ -51,10 +51,10 @@ Map context = [
   ],
   stages:[
     'Build': true,
-    'Unit Test': true,
-    'Code Quality': true,
+    'Unit Test': false,
+    'Code Quality': false,
     'Readiness - DEV': true,
-    'Full Test - DEV': true
+    'Full Test - DEV': false
   ]
 ]
 
@@ -276,8 +276,9 @@ podTemplate(label: label, serviceAccount: 'jenkins', cloud: 'openshift', contain
 
 
         if (1 == 1 && "DEV".equalsIgnoreCase(stageDeployName)){
-            String baseURL = context.deployments[envKeyName].environmentUrl.substring(0, context.deployments[envKeyName].environmentUrl.indexOf('/', 8) + 1)
+
             stage('API Test') {
+                String baseURL = context.deployments[envKeyName].environmentUrl.substring(0, context.deployments[envKeyName].environmentUrl.indexOf('/', 8) + 1)
                 podTemplate(label: 'nodejs', name: 'nodejs', serviceAccount: 'jenkins', cloud: 'openshift', containers: [
                   containerTemplate(
                     name: 'jnlp',
@@ -305,10 +306,15 @@ podTemplate(label: label, serviceAccount: 'jenkins', cloud: 'openshift', contain
                         echo "checking out source"
                         echo "Build: ${BUILD_ID}"
                         echo "baseURL: ${baseURL}"
+                        sh '''#!/bin/bash
+                            echo BASEURL=$BASEURL
+                        '''
+
+                        input(message: "Verify Environment variables. Continue?")
                         checkout scm
                         dir('api-tests') {
                             sh 'npm install -g newman'
-                            sh 'echo BASEURL=$BASEURL'
+
                             try {
                                 sh 'newman run ./registries_api_tests.json --global-var test_user=$GWELLS_API_TEST_USER --global-var test_password=$GWELLS_API_TEST_PASSWORD --global-var base_url="${BASEURL}" --global-var auth_server=$GWELLS_API_TEST_AUTH_SERVER --global-var client_id=$GWELLS_API_TEST_CLIENT_ID --global-var client_secret=$GWELLS_API_TEST_CLIENT_SECRET -r cli,junit,html;'
                             } finally {
