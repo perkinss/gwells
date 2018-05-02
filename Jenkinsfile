@@ -290,7 +290,7 @@ podTemplate(label: label, serviceAccount: 'jenkins', cloud: 'openshift', contain
                     command: '',
                     args: '${computer.jnlpmac} ${computer.name}',
                     envVars: [
-                        envVar(key:'BASEURL', value: baseURL),
+                        envVar(key:'BASEURL', value: "${baseURL}gwells"),
                         secretEnvVar(key: 'GWELLS_API_TEST_USER', secretName: 'apitest-secrets', secretKey: 'username'),
                         secretEnvVar(key: 'GWELLS_API_TEST_PASSWORD', secretName: 'apitest-secrets', secretKey: 'password'),
                         secretEnvVar(key: 'GWELLS_API_TEST_AUTH_SERVER', secretName: 'apitest-secrets', secretKey: 'auth_server'),
@@ -308,8 +308,9 @@ podTemplate(label: label, serviceAccount: 'jenkins', cloud: 'openshift', contain
                         checkout scm
                         dir('api-tests') {
                             sh 'npm install -g newman'
+                            sh 'echo BASEURL=$BASEURL'
                             try {
-                                sh 'newman run ./registries_api_tests.json --global-var test_user=$GWELLS_API_TEST_USER --global-var test_password=$GWELLS_API_TEST_PASSWORD --global-var base_url="${BASEURL}/gwells" --global-var auth_server=$GWELLS_API_TEST_AUTH_SERVER --global-var client_id=$GWELLS_API_TEST_CLIENT_ID --global-var client_secret=$GWELLS_API_TEST_CLIENT_SECRET -r cli,junit,html;'
+                                sh 'newman run ./registries_api_tests.json --global-var test_user=$GWELLS_API_TEST_USER --global-var test_password=$GWELLS_API_TEST_PASSWORD --global-var base_url="${BASEURL}" --global-var auth_server=$GWELLS_API_TEST_AUTH_SERVER --global-var client_id=$GWELLS_API_TEST_CLIENT_ID --global-var client_secret=$GWELLS_API_TEST_CLIENT_SECRET -r cli,junit,html;'
                             } finally {
                                     junit 'newman/*.xml'
                                     publishHTML (target: [
